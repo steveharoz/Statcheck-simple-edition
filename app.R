@@ -54,7 +54,7 @@ ui <- fluidPage(
             wellPanel(id = "credit_box",
                 p(
                     "StatCheck simple edition by",
-                    a('Steve Haroz', href="http://steveharoz.com")
+                    a('Steve Haroz ', href="http://steveharoz.com")
                 ),
                 p(
                     a('StatCheck', href="http://statcheck.io"),
@@ -63,10 +63,14 @@ ui <- fluidPage(
                     "and",
                     a('Michèle B. Nuijten', href="https://mbnuijten.com")
                 ),
-                p(a(
-                  icon("twitter"), 
-                  " @sharoz", href="https://twitter.com/sharoz"
-                )),
+                p(
+                  span("Updates: "),
+                  a(icon("twitter"), span(" @sharoz"), href="https://twitter.com/sharoz")
+                ),
+                p(
+                    span("Source code: "),
+                    a(icon("github"), span("Github"), href="https://github.com/steveharoz/statcheck-simple-edition")
+                ),
                 p(
                   span("Funding: "), 
                   a(href='http://aviz.fr', img(src='aviz.png', height='14px', alt='Aviz', style='opacity:0.75'))
