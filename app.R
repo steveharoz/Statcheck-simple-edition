@@ -40,7 +40,7 @@ ui <- fluidPage(
             ),
             
             # the input
-            textAreaInput("statcheckInput", "Enter text that reports statistical tests:", "Here is some text with statistical tests F(12,34)=0.56, p=0.078. Blah blah t(123)=.45, p=0.65. Blah blah T(100)=1.0, P=0.16 and also X2(1, N=56) = 7.8, p < .01. \n\nSome non-standard reporting F2,20=2; p = 0.16 and T[25] = 1.8;p=0.08 and T25 = 35;p=0.", width = "100%", row = "10"),
+            textAreaInput("statcheckInput", "Enter text that reports statistical tests:", "Here is some text with statistical tests F(12,34)=0.56, p=0.078. Blah blah t(123)=.45, p=0.65. Blah blah T(100)=1.7, P=0.046 and also X2(1, N=56) = 7.8, p < .01. \n\nSome non-standard reporting F2,20=2; p = 0.16 and some abnormal spaces F(2,20)\u202F=\u202F2; p\u00A0=\u00A00.16 and T[25] = 1.8;p=0.08 and T25 = 35;p=0 and X\u00B2(1, N=56) = 7.8, p=0.005", width = "100%", row = "10"),
             
             # formatting fixes
             span(
@@ -118,10 +118,17 @@ preprocess_text = function(text) {
     str_replace_all(fixed("["), fixed("(")) %>% 
     str_replace_all(fixed("]"), fixed(")"))
   
+  # squared symbol
+  text = text %>% str_replace_all(fixed("\u00B2"), fixed("2"))
+  
   # statcheck has trouble with statistics or p values that are exactly 0 or 1
   text = text %>% 
-    str_replace_all("=\\s?0(?!(\\d|(\\.\\d)))", fixed("= 0.0")) %>% 
-    str_replace_all("=\\s?1(?!(\\d|(\\.\\d)))", fixed("= 1.0"))
+    str_replace_all("=\\s?0(?!(\\d|(\\.\\d)))", fixed("= 0.0")) %>% # seen this one
+    str_replace_all("<\\s?0(?!(\\d|(\\.\\d)))", fixed("< 0.0")) %>% # seen this one
+    str_replace_all(">\\s?0(?!(\\d|(\\.\\d)))", fixed("> 0.0")) %>% 
+    str_replace_all("=\\s?1(?!(\\d|(\\.\\d)))", fixed("= 1.0")) %>% # seen this one 
+    str_replace_all("<\\s?1(?!(\\d|(\\.\\d)))", fixed("< 1.0")) %>% # seen this one
+    str_replace_all(">\\s?1(?!(\\d|(\\.\\d)))", fixed("> 1.0")) 
   
   # recognize t and f tests without parentheses
   # this issue is common when subscripts are used for the degrees of freedom
