@@ -44,7 +44,7 @@ ui <- fluidPage(
             ),
             
             # the input
-            textAreaInput("statcheckInput", "Enter text that reports statistical tests:", "Here is some text with statistical tests F(12,34)=0.56, p=0.078. Blah blah t(123)=.45, p=0.65. Blah blah T(100)=1.9, P=0.03 and also X2(1, N=56) = 7.8, p < .01. \n\nSome non-standard reporting F2,20=2; p = 0.16 and some abnormal spaces F(2,20)\u202F=\u202F2; p\u00A0=\u00A00.16 and T[25] = 1.8;p=0.08 and T25 = 35;p=0 and X\u00B2(1, N=56) = 7.8, p=0.005", width = "100%", row = "10"),
+            textAreaInput("statcheckInput", "Enter text that reports statistical tests:", "Here is some text with statistical tests F(12,34)=0.56, p=0.048. Blah blah t(123)=.45, p=0.65. Blah blah T(100)=1.9, P=0.03 and also X2(1, N=56) = 7.8, p < .01. \n\nSome non-standard reporting F2,20=2; p = 0.16 and some abnormal spaces F(2,20)\u202F=\u202F2; p\u00A0=\u00A00.16 and T[25] = 1.8;p=0.08 and T25 = 35;p=0 and X\u00B2(1, N=56) = 7.8, p=0.005", width = "100%", row = "10"),
             
             # URL input
             # textInput("URL_input", "Or enter the URL of an article:", ""),
@@ -213,22 +213,22 @@ server <- function(input, output) {
         
         # make it fancy
         resultTable = resultTable  %>% 
-            mutate(Reported_P = ifelse(
-                Error & !OneTail,
-                paste("<span class='error'>", Reported_P, "</span>"),
-                Reported_P
+            mutate(Reported_P = case_when(
+              DecisionError & !OneTail ~ paste("<span class='decision_error'>", Reported_P, "</span>"),
+              Error & !OneTail ~ paste("<span class='error'>", Reported_P, "</span>"),
+              TRUE ~ Reported_P
             )) %>% 
-            mutate(Computed_P = ifelse(
-                Error & !OneTail,
-                paste("<span class='error'>", Computed_P, "</span>"),
-                Computed_P
+            mutate(Computed_P = case_when(
+              DecisionError & !OneTail ~ paste("<span class='decision_error'>", Computed_P, "</span>"),
+              Error & !OneTail ~ paste("<span class='error'>", Computed_P, "</span>"),
+              TRUE ~ Computed_P
             )) %>% 
-            mutate(Correct = ifelse(OneTail, "One-tailed", 
-             ifelse(
-                  Error,
-                  "<span class='error'>INCORRECT</span>",
-                  "&#10003;"
-            ))) %>% 
+            mutate(Correct = case_when(
+              OneTail ~ "One-tailed",
+              DecisionError ~ paste("<span class='decision_error'>INCORRECT</span>"),
+              Error ~ paste("<span class='error'>INCORRECT</span>"),
+              TRUE ~ "&#10003;"
+            )) %>% 
             rename(" " = Statistic)
         
         # Downloadable csv of the table
