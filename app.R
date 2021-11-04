@@ -6,6 +6,7 @@
 # https://shiny.rstudio.com/images/shiny-cheatsheet.pdf
 
 library(shiny)
+library(shinyjs) # show/hide
 library(dplyr)
 library(stringr)
 library(metathis)
@@ -28,6 +29,9 @@ ui <- fluidPage(
         twitter_card_type = "summary"
       ),
     
+    # enable shinyjs
+    useShinyjs(),
+    
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
         div(
@@ -42,9 +46,12 @@ ui <- fluidPage(
             # the input
             textAreaInput("statcheckInput", "Enter text that reports statistical tests:", "Here is some text with statistical tests F(12,34)=0.56, p=0.078. Blah blah t(123)=.45, p=0.65. Blah blah T(100)=1.9, P=0.03 and also X2(1, N=56) = 7.8, p < .01. \n\nSome non-standard reporting F2,20=2; p = 0.16 and some abnormal spaces F(2,20)\u202F=\u202F2; p\u00A0=\u00A00.16 and T[25] = 1.8;p=0.08 and T25 = 35;p=0 and X\u00B2(1, N=56) = 7.8, p=0.005", width = "100%", row = "10"),
             
+            # URL input
+            # textInput("URL_input", "Or enter the URL of an article:", ""),
+            
             # formatting fixes
             span(
-              "Recognize non-standard reporting: ", 
+              strong("Recognize non-standard reporting: "), 
               checkboxInput("statCheckFix", NULL, TRUE, width = '20px'), 
               title = "(Recommended) Extend statcheck to be much more forgiving to deviations from APA style.",
               id="formatting_input"   
@@ -83,21 +90,24 @@ ui <- fluidPage(
         # Show the statcheck result table
         div(
            tableOutput("statcheckOutput"),
-           class = "col-md-4",
-           id = "results"
+           downloadButton("downloadData", "Download as CSV", style="display:none; float:right"),
+           class = "col-md-8",
+           id = "results",
+           style = "width: fit-content;"
         )
-    ),
+    )#,
     
     div(HTML(
-    '<!-- StatCounter -->
-	  <script type="text/javascript">
-		sc_project=1771316; 
-		sc_invisible=1; 
-		sc_partition=16; 
-		sc_security="caf1424b"; 
-	  </script>
-    <script type="text/javascript" src="https://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div class="statcounter"><a href="https://www.statcounter.com/" target="_blank"><img class="statcounter" src="https://c17.statcounter.com/1771316/0/caf1424b/1/" alt="hit counter code" /></a></div></noscript>'
-    ))
+#     div(HTML(
+#     '<!-- StatCounter -->
+# 	  <script type="text/javascript">
+# 		sc_project=1771316; 
+# 		sc_invisible=1; 
+# 		sc_partition=16; 
+# 		sc_security="caf1424b"; 
+# 	  </script>
+#     <script type="text/javascript" src="https://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div class="statcounter"><a href="https://www.statcounter.com/" target="_blank"><img class="statcounter" src="https://c17.statcounter.com/1771316/0/caf1424b/1/" alt="hit counter code" /></a></div></noscript>'
+#     ))
 )
 
 
@@ -156,18 +166,21 @@ preprocess_text = function(text) {
 # Define server logic required to draw the table
 server <- function(input, output) {
     output$statcheckOutput <- renderTable({ 
+        # get text from textbox
         statcheck_input = input$statcheckInput %>% str_to_lower()
-        statcheck_fix = input$statCheckFix
         
         # fix formatting issues if possible
+        statcheck_fix = input$statCheckFix
         if (statcheck_fix) {
           statcheck_input = preprocess_text(statcheck_input)
         }
         
         # get raw statcheck results
         resultTable = statcheck(statcheck_input)
-        if (is.null(resultTable))
+        if (is.null(resultTable)) {
+            shinyjs::hide("downloadData")
             return(NULL)
+        }
         
         # clean up the columns
         resultTable = resultTable %>% 
@@ -183,6 +196,9 @@ server <- function(input, output) {
             mutate(Reported_P = format(Reported_P, digits=2, nsmall=3, drop0trailing=TRUE)) %>% 
             mutate(Computed_P = format(Computed_P, digits=2, nsmall=3, drop0trailing=TRUE)) %>% 
             ungroup()
+        
+        # downloadable version of table without formatting
+        downloadTable = resultTable
         
         # statistics symbols
         resultTable = resultTable %>% 
@@ -215,7 +231,23 @@ server <- function(input, output) {
             ))) %>% 
             rename(" " = Statistic)
         
-        # return the table
+        # Downloadable csv of the table
+        downloadTable = downloadTable %>% 
+          mutate(Correct = ifelse(OneTail, "One-tailed", ifelse(Error, "Incorrect", "yes"))) %>% 
+          mutate(df1 = ifelse(df1=="-", "", df1)) %>% 
+          mutate(df2 = ifelse(df2=="-", "", df2)) %>% 
+          select(Statistic, df1, df2, Value, Reported_P, Computed_P, Correct)
+        # save as CSV
+        output$downloadData <- downloadHandler(
+          "statchecksimple.csv",
+          content = function(file) {
+            write.csv(downloadTable, file, row.names = FALSE)
+          }
+        )
+        # make the button visible
+        shinyjs::show("downloadData")
+        
+        # drop unnecessary columns and return
         resultTable %>% select(-Source, -APAfactor, -Raw, -DecisionError, -Test.Comparison, -Reported.Comparison, -Error, -OneTail, -OneTailedInTxt)
         
     }, striped = TRUE,
