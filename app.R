@@ -194,8 +194,11 @@ server <- function(input, output) {
             rename(Reported_P = Reported.P.Value, Computed_P = Computed)
         
         # is p close?
+        checkSmallErrors = input$checkSmallErrors
         resultTable = resultTable %>% 
-          mutate(P_is_close = (Reported_P > (1-CLOSE_RANGE) * Computed_P) & (Reported_P < (1+CLOSE_RANGE) * Computed_P))
+          mutate(P_is_close = (abs(Reported_P - Computed_P)/(Reported_P/2 + Computed_P/2) < CLOSE_RANGE)) %>% 
+          mutate(P_is_close = P_is_close | abs(Reported_P-Computed_P) < 0.0001) %>% 
+          mutate(P_is_close = P_is_close & checkSmallErrors)
         
         # digits
         resultTable = resultTable %>% 
@@ -226,18 +229,18 @@ server <- function(input, output) {
         resultTable = resultTable  %>% 
             mutate(Reported_P = case_when(
               DecisionError & !OneTail ~ paste("<span class='decision_error'>", Reported_P, "</span>"),
-              Error & !OneTail ~ paste("<span class='error'>", Reported_P, "</span>"),
+              Error & !OneTail & !P_is_close ~ paste("<span class='error'>", Reported_P, "</span>"),
               TRUE ~ Reported_P
             )) %>% 
             mutate(Computed_P = case_when(
               DecisionError & !OneTail ~ paste("<span class='decision_error'>", Computed_P, "</span>"),
-              Error & !OneTail ~ paste("<span class='error'>", Computed_P, "</span>"),
+              Error & !OneTail & !P_is_close ~ paste("<span class='error'>", Computed_P, "</span>"),
               TRUE ~ Computed_P
             )) %>% 
             mutate(Correct = case_when(
               OneTail ~ "One-tailed?",
               DecisionError ~ "<span class='decision_error'>INCORRECT</span>",
-              Error & P_is_close ~ "<span class='error'>Small error</span>",
+              Error & P_is_close ~ "Small error",
               Error ~ "<span class='error'>INCORRECT</span>",
               TRUE ~ "&#10003;"
             )) %>% 
