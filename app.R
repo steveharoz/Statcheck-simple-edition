@@ -12,6 +12,8 @@ library(stringr)
 library(metathis)
 library(statcheck)
 
+CLOSE_RANGE = 0.05 # percent proximity of computed vs reported p-values to still be considered "close"
+
 # Define UI for application that draws a histogram
 ui <- fluidPage(
     tags$head(
@@ -77,10 +79,6 @@ ui <- fluidPage(
                 p(
                     span("Source code: "),
                     a(icon("github"), span("Github"), href="https://github.com/steveharoz/statcheck-simple-edition")
-                ),
-                p(
-                  span("Funding: "), 
-                  a(href='http://aviz.fr', img(src='aviz.png', height='14px', alt='Aviz', style='opacity:0.75'))
                 ),
                 br(), 
                 p("To cite this page: ", br(), span("Haroz, S., Nuijten, M. B., Epskamp, S. (2021). StatCheck simple edition [web application]. Retrieved from http://steveharoz.com/statchecksimple", id="citation"))
@@ -186,6 +184,10 @@ server <- function(input, output) {
         resultTable = resultTable %>% 
             rename(Reported_P = Reported.P.Value, Computed_P = Computed)
         
+        # is p close?
+        resultTable = resultTable %>% 
+          mutate(P_is_close = (Reported_P > (1-CLOSE_RANGE) * Computed_P) & (Reported_P < (1+CLOSE_RANGE) * Computed_P))
+        
         # digits
         resultTable = resultTable %>% 
             mutate(df1 = ifelse(is.na(df1), "-", df1)) %>% 
@@ -224,16 +226,17 @@ server <- function(input, output) {
               TRUE ~ Computed_P
             )) %>% 
             mutate(Correct = case_when(
-              OneTail ~ "One-tailed",
-              DecisionError ~ paste("<span class='decision_error'>INCORRECT</span>"),
-              Error ~ paste("<span class='error'>INCORRECT</span>"),
+              OneTail ~ "One-tailed?",
+              DecisionError ~ "<span class='decision_error'>INCORRECT</span>",
+              Error & P_is_close ~ "<span class='error'>Small error</span>",
+              Error ~ "<span class='error'>INCORRECT</span>",
               TRUE ~ "&#10003;"
             )) %>% 
             rename(" " = Statistic)
         
         # Downloadable csv of the table
         downloadTable = downloadTable %>% 
-          mutate(Correct = ifelse(OneTail, "One-tailed", ifelse(Error, "Incorrect", "yes"))) %>% 
+          mutate(Correct = ifelse(OneTail, "One-tailed?", ifelse(Error, "Incorrect", "yes"))) %>% 
           mutate(df1 = ifelse(df1=="-", "", df1)) %>% 
           mutate(df2 = ifelse(df2=="-", "", df2)) %>% 
           select(Statistic, df1, df2, Value, Reported_P, Computed_P, Correct)
@@ -248,7 +251,7 @@ server <- function(input, output) {
         shinyjs::show("downloadData")
         
         # drop unnecessary columns and return
-        resultTable %>% select(-Source, -APAfactor, -Raw, -DecisionError, -Test.Comparison, -Reported.Comparison, -Error, -OneTail, -OneTailedInTxt)
+        resultTable %>% select(-Source, -APAfactor, -Raw, -DecisionError, -Test.Comparison, -Reported.Comparison, -Error, -OneTail, -OneTailedInTxt, -P_is_close)
         
     }, striped = TRUE,
     align = "r",
