@@ -13,7 +13,7 @@
 @media (prefers-color-scheme: dark) {
     body {
         background-color: #111;
-        color: white;
+        color: #ccc;
     }
     
     .table-striped>tbody>tr:nth-of-type(odd) {
@@ -31,14 +31,14 @@
     }    
     
     .form-control {
-      color: #bbb;
+      color: #ccc;
       background-color: #222;
       border: 1px solid #333;
       box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
     }
     
     .btn-default {
-      color: #bbb;
+      color: #ccc;
       background-color: #222;
       border-color: #333;
       border-top-color: rgb(50, 50, 50);
