@@ -74,8 +74,7 @@ ui <- fixedPage(
         column(width = 6, div(
            tableOutput("statcheckOutput"),
            downloadButton("downloadData", "Download as CSV", style="display:none; float:right"),
-           id = "results",
-           style = "width: fit-content;"
+           id = "results"
         ))
     ),
     
@@ -266,8 +265,10 @@ server <- function(input, output) {
         # drop unnecessary columns and return
         resultTable %>% select(-Source, -APAfactor, -Raw, -DecisionError, -Test.Comparison, -Reported.Comparison, -Error, -OneTail, -OneTailedInTxt, -P_is_close)
         
-    }, striped = TRUE,
+    }, 
+    striped = TRUE,
     align = "r",
+    width = "100%",
     sanitize.text.function = function(x) {x})
     # # from https://stackoverflow.com/a/51516534/529799
     # sanitize.text.function = function(x) sapply(x, function(x){
