@@ -8,5 +8,45 @@
 
 .form-group { margin-bottom: 0.5em; }
 
-.error {color:red;}
-.decision_error {color:red; font-weight:bold;}
+.error, .decision_error {color:red;}
+.decision_error {font-weight:bold;}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #111;
+        color: white;
+    }
+    
+    .table-striped>tbody>tr:nth-of-type(odd) {
+      background-color: #222;
+    }
+    .table-striped>tbody>tr {
+      border-color: #333;
+    }
+      
+    
+    .well {
+        background-color: #090909;
+        box-shadow: inset 0 1px 1px rgb(0 0 0 / 5%);
+    }    
+    
+    .form-control {
+      color: #bbb;
+      background-color: #222;
+      border: 1px solid #333;
+      box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+    }
+    
+    .btn-default {
+      color: #bbb;
+      background-color: #222;
+      border-color: #333;
+      border-top-color: rgb(50, 50, 50);
+      border-right-color: rgb(50, 50, 50);
+      border-bottom-color: rgb(50, 50, 50);
+      border-left-color: rgb(50, 50, 50);
+  }
+  
+  .error, .decision_error {color:#ff3333;}
+}

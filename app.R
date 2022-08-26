@@ -26,7 +26,7 @@ ui <- fluidPage(
       meta_social(
         title = "StatCheck simple edition",
         description = "Check for errors in statistical tests",
-        image = "https://steveharoz.shinyapps.io/statchecksimple/logo.png",
+        image = "https://shiny.steveharoz.com/statchecksimple/logo.png",
         twitter_creator = "@sharoz",
         twitter_card_type = "summary"
       ),
@@ -41,7 +41,7 @@ ui <- fluidPage(
             
             # Application title
             titlePanel(
-                img(src='logo.png', width='100%', alt='StatCheck simple edition'),
+                img(src='logo_transparent.png', width='100%', alt='StatCheck simple edition'),
                 'StatCheck simple edition'
             ),
             
