@@ -1,10 +1,8 @@
 #formatting_input *, #check_small_errors * {display: inline; font-weight: 700;}
 
-#credit_box {border: 0; margin-top: 1em;}
+#credit_box {border: 0; margin-top: 2em; margin-bottom: 1em;}
 
 #citation {font-family: monospace; word-break: break-word;}
-
-#results {padding-top: 2em;}
 
 .form-group { margin-bottom: 0.5em; }
 
@@ -19,10 +17,11 @@
     }
     
     .table-striped>tbody>tr:nth-of-type(odd) {
-      background-color: #222;
+      background-color: #202020;
     }
-    .table-striped>tbody>tr {
-      border-color: #333;
+    .table>tbody>tr>td,
+    .table>thead>tr>th {
+        border-color: #333;
     }
       
     

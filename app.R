@@ -15,7 +15,7 @@ library(statcheck)
 CLOSE_RANGE = 0.05 # percent proximity of computed vs reported p-values to still be considered "close"
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(
+ui <- fixedPage(
     tags$head(
         tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
         tags$link(rel="icon", type="image/png", href="favicon.png")
@@ -26,7 +26,7 @@ ui <- fluidPage(
       meta_social(
         title = "StatCheck simple edition",
         description = "Check for errors in statistical tests",
-        image = "https://shiny.steveharoz.com/statchecksimple/logo.png",
+        image = "https://statcheck.steveharoz.com/logo.png",
         twitter_creator = "@sharoz",
         twitter_card_type = "summary"
       ),
@@ -34,16 +34,17 @@ ui <- fluidPage(
     # enable shinyjs
     useShinyjs(),
     
+    # Application title
+    fixedRow( column(width = 12,
+      titlePanel(
+        img(src='logo_wide_transparent.png', width='100%', alt='StatCheck simple edition'),
+        windowTitle = 'StatCheck simple edition'
+      )
+    )),
+    
     # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        div(
-            class = "col-md-4",
-            
-            # Application title
-            titlePanel(
-                img(src='logo_transparent.png', width='100%', alt='StatCheck simple edition'),
-                'StatCheck simple edition'
-            ),
+    fixedRow(
+        column(width = 6, div(
             
             # the input
             textAreaInput("statcheckInput", "Enter text that reports statistical tests:", "Here is some text with statistical tests F(12,34)=0.56, p=0.048. Blah blah t(123)=.45, p=0.65. Blah blah T(100)=1.9, P=0.03 and also X2(1, N=56) = 7.8, p < .01. \n\nSome non-standard reporting F2,20=2; p = 0.16 and some abnormal spaces F(2,20)\u202F=\u202F2; p\u00A0=\u00A00.26 and T[25] = 1.8;p=0.08 and T25 = 35;p=0 and X\u00B2(1, N=56) = 7.8, p=0.005", width = "100%", row = "10"),
@@ -66,52 +67,52 @@ ui <- fluidPage(
               checkboxInput("checkSmallErrors", NULL, FALSE, width = '20px'), 
               title = "Point out \"small errors\" that: \n(1) don't cross the 0.05 boundary, \n(2) cannot be explained by a rounding error, \n(3) are less than 5% of the p-value or less than 0.0001.",
               id="check_small_errors"   
-            ),
-            
-            # Credit
-            wellPanel(id = "credit_box",
-                p(
-                    "StatCheck simple edition by",
-                    a('Steve Haroz ', href="http://steveharoz.com")
-                ),
-                p(
-                    a('StatCheck', href="http://statcheck.io"),
-                    "by",
-                    a('Sacha Epskamp', href="http://sachaepskamp.com/"),
-                    "and",
-                    a('Michèle B. Nuijten', href="https://mbnuijten.com")
-                ),
-                p(
-                  span("Updates: "),
-                  a(icon("twitter"), span(" @sharoz"), href="https://twitter.com/sharoz")
-                ),
-                p(
-                    span("Source code: "),
-                    a(icon("github"), span("Github"), href="https://github.com/steveharoz/statcheck-simple-edition")
-                ),
-                br(), 
-                p("To cite this page: ", br(), span("Haroz, S., Nuijten, M. B., Epskamp, S. (2021). StatCheck simple edition [web application]. Retrieved from http://steveharoz.com/statchecksimple", id="citation"))
-            ),
-        ),
+            )
+        )),
 
         # Show the statcheck result table
-        div(
+        column(width = 6, div(
            tableOutput("statcheckOutput"),
            downloadButton("downloadData", "Download as CSV", style="display:none; float:right"),
-           class = "col-md-8",
            id = "results",
            style = "width: fit-content;"
-        )
-    )#,
+        ))
+    ),
     
-    div(HTML(
-#     div(HTML(
+    # Credit
+    fixedRow( column(width = 12, wellPanel(id = "credit_box",
+              p(
+                "StatCheck simple edition by",
+                a('Steve Haroz ', href="http://steveharoz.com")
+              ),
+              p(
+                a('StatCheck', href="http://statcheck.io"),
+                "by",
+                a('Sacha Epskamp', href="http://sachaepskamp.com/"),
+                "and",
+                a('Michèle B. Nuijten', href="https://mbnuijten.com")
+              ),
+              p(
+                span("Updates: "),
+                a(icon("twitter"), span(" @sharoz"), href="https://twitter.com/sharoz")
+              ),
+              p(
+                span("Source code: "),
+                a(icon("github"), span("Github"), href="https://github.com/steveharoz/statcheck-simple-edition")
+              ),
+              br(), 
+              p("To cite this page: ", br(), span("Haroz, S., Nuijten, M. B., Epskamp, S. (2021). StatCheck simple edition [web application]. Retrieved from http://steveharoz.com/statchecksimple", id="citation"))
+    )))
+    
+    
+    
+#     ,div(HTML(
 #     '<!-- StatCounter -->
 # 	  <script type="text/javascript">
-# 		sc_project=1771316; 
-# 		sc_invisible=1; 
-# 		sc_partition=16; 
-# 		sc_security="caf1424b"; 
+# 		sc_project=1771316;
+# 		sc_invisible=1;
+# 		sc_partition=16;
+# 		sc_security="caf1424b";
 # 	  </script>
 #     <script type="text/javascript" src="https://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div class="statcounter"><a href="https://www.statcounter.com/" target="_blank"><img class="statcounter" src="https://c17.statcounter.com/1771316/0/caf1424b/1/" alt="hit counter code" /></a></div></noscript>'
 #     ))
