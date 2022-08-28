@@ -53,20 +53,20 @@ ui <- fixedPage(
             # textInput("URL_input", "Or enter the URL of an article:", ""),
             
             # formatting fixes
-            span(
+            div(
               strong("Recognize non-standard reporting:"),
               HTML("&nbsp;"),
               checkboxInput("statCheckFix", NULL, TRUE, width = '20px'), 
               title = "(Recommended) Extend statcheck to be much more forgiving of deviations from APA style.",
-              id="formatting_input"   
-            ), br(),
+              id="formatting_input", class = "option"
+            ),
             # check for small errors
-            span(
+            div(
               strong("Differentiate small errors:  "),
               HTML("&nbsp;"),
               checkboxInput("checkSmallErrors", NULL, FALSE, width = '20px'), 
               title = "Point out \"small errors\" that: \n(1) don't cross the 0.05 boundary, \n(2) cannot be explained by a rounding error, \n(3) are less than 5% of the p-value or less than 0.0001.",
-              id="check_small_errors"   
+              id="check_small_errors", class = "option"   
             )
         )),
 
@@ -100,7 +100,7 @@ ui <- fixedPage(
                 a(icon("github"), span("Github"), href="https://github.com/steveharoz/statcheck-simple-edition")
               ),
               br(), 
-              p("To cite this page: ", br(), span("Haroz, S., Nuijten, M. B., Epskamp, S. (2021). StatCheck simple edition [web application]. Retrieved from http://steveharoz.com/statchecksimple", id="citation"))
+              p("To cite this page: ", br(), span("Haroz, S., Nuijten, M. B., Epskamp, S. (2021). StatCheck simple edition [web application]. Retrieved from http://statcheck.steveharoz.com", id="citation"))
     )))
     
     
