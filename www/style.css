@@ -1,15 +1,20 @@
-.option { margin-top: 0.6em; font-weight: 700;}
-.option * {display: inline;}
-
+/* footer */
 #credit_box {border: 0; margin-top: 2em; margin-bottom: 1em;}
 
 #citation {font-family: monospace; word-break: break-word;}
+/* text area */
+textarea { resize: vertical; }
 
+/* options */
 .form-group { margin-bottom: 0.5em; }
+.option { margin-top: 0.6em; font-weight: 700;}
+.option * {display: inline;}
 
+/* table style */
 .error, .decision_error {color:red;}
 .decision_error {font-weight:bold;}
 
+/* for mobile */
 @media (max-width: 575.98px) {
     .table { font-size: 66%; }
     .table.shiny-table>thead>tr>th, .table.shiny-table>thead>tr>td, 

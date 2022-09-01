@@ -54,17 +54,15 @@ ui <- fixedPage(
             
             # formatting fixes
             div(
-              strong("Recognize non-standard reporting:"),
-              HTML("&nbsp;"),
               checkboxInput("statCheckFix", NULL, TRUE, width = '20px'), 
+              strong("Recognize non-standard reporting:"),
               title = "(Recommended) Extend statcheck to be much more forgiving of deviations from APA style.",
               id="formatting_input", class = "option"
             ),
             # check for small errors
             div(
-              strong("Differentiate small errors:  "),
-              HTML("&nbsp;"),
               checkboxInput("checkSmallErrors", NULL, FALSE, width = '20px'), 
+              strong("Differentiate small errors:  "),
               title = "Point out \"small errors\" that: \n(1) don't cross the 0.05 boundary, \n(2) cannot be explained by a rounding error, \n(3) are less than 5% of the p-value or less than 0.0001.",
               id="check_small_errors", class = "option"   
             )
