@@ -55,16 +55,23 @@ ui <- fixedPage(
             # formatting fixes
             div(
               checkboxInput("statCheckFix", NULL, TRUE, width = '20px'), 
-              strong("Recognize non-standard reporting:"),
+              strong("Recognize non-standard reporting"),
               title = "(Recommended) Extend statcheck to be much more forgiving of deviations from APA style.",
               id="formatting_input", class = "option"
             ),
             # check for small errors
             div(
-              checkboxInput("checkSmallErrors", NULL, FALSE, width = '20px'), 
-              strong("Differentiate small errors:  "),
+              checkboxInput("checkSmallErrors", NULL, TRUE, width = '20px'), 
+              strong("Differentiate small errors"),
               title = "Point out \"small errors\" that: \n(1) don't cross the 0.05 boundary, \n(2) cannot be explained by a rounding error, \n(3) are less than 5% of the p-value or less than 0.0001.",
               id="check_small_errors", class = "option"   
+            ),
+            # try one-tailed too
+            div(
+              checkboxInput("checkOneTailed", NULL, TRUE, width = '20px'), 
+              strong("Detect possible one-tailed tests"),
+              title = "If the reported p-value doesn't match, try to match it to a one-tailed test.",
+              id="check_onetailed", class = "option"
             )
         )),
 
@@ -177,9 +184,12 @@ server <- function(input, output) {
     output$statcheckOutput <- renderTable({ 
         # get text from textbox
         statcheck_input = input$statcheckInput %>% str_to_lower()
+        # get options
+        statcheck_fix = input$statCheckFix
+        checkSmallErrors = input$checkSmallErrors
+        checkOneTailed = input$checkOneTailed
         
         # fix formatting issues if possible
-        statcheck_fix = input$statCheckFix
         if (statcheck_fix) {
           statcheck_input = preprocess_text(statcheck_input)
         }
@@ -196,7 +206,6 @@ server <- function(input, output) {
             rename(Reported_P = Reported.P.Value, Computed_P = Computed)
         
         # is p close?
-        checkSmallErrors = input$checkSmallErrors
         resultTable = resultTable %>% 
           mutate(P_is_close = (abs(Reported_P - Computed_P)/(Reported_P/2 + Computed_P/2) < CLOSE_RANGE)) %>% 
           mutate(P_is_close = P_is_close | abs(Reported_P-Computed_P) < 0.0001) %>% 
@@ -230,19 +239,19 @@ server <- function(input, output) {
         # make it fancy
         resultTable = resultTable  %>% 
             mutate(Reported_P = case_when(
-              DecisionError & !OneTail ~ paste("<span class='decision_error'>", Reported_P, "</span>"),
-              Error & !OneTail & !P_is_close ~ paste("<span class='error'>", Reported_P, "</span>"),
+              DecisionError & !(checkOneTailed & OneTail) ~ paste("<span class='decision_error'>", Reported_P, "</span>"),
+              Error & !(checkOneTailed & OneTail) & !P_is_close ~ paste("<span class='error'>", Reported_P, "</span>"),
               TRUE ~ Reported_P
             )) %>% 
             mutate(Computed_P = case_when(
-              DecisionError & !OneTail ~ paste("<span class='decision_error'>", Computed_P, "</span>"),
-              Error & !OneTail & !P_is_close ~ paste("<span class='error'>", Computed_P, "</span>"),
+              DecisionError & !(checkOneTailed & OneTail) ~ paste("<span class='decision_error'>", Computed_P, "</span>"),
+              Error & !(checkOneTailed & OneTail) & !P_is_close ~ paste("<span class='error'>", Computed_P, "</span>"),
               TRUE ~ Computed_P
             )) %>% 
             mutate(Correct = case_when(
-              OneTail ~ "One-tailed?",
-              DecisionError ~ "<span class='decision_error'>INCORRECT</span>",
-              Error & P_is_close ~ "Small error",
+              OneTail & checkOneTailed ~ "<span title='This discrepancy might be explained by a one-way test instead of the assumed two-way test.'>One-tailed?</span>",
+              DecisionError ~ "<span class='decision_error' title='This error crosses the common 0.05 threshold, which may cause an dichotomous interpretation error'>INCORRECT</span>",
+              Error & P_is_close ~ "<span title='This error is very small and may be due to mistaken rounding.'>Small error</span>",
               Error ~ "<span class='error'>INCORRECT</span>",
               TRUE ~ "&#10003;"
             )) %>% 
@@ -250,7 +259,7 @@ server <- function(input, output) {
         
         # Downloadable csv of the table
         downloadTable = downloadTable %>% 
-          mutate(Correct = ifelse(OneTail, "One-tailed?", ifelse(Error, "Incorrect", "yes"))) %>% 
+          mutate(Correct = ifelse(checkOneTailed & OneTail, "One-tailed?", ifelse(Error, "Incorrect", "yes"))) %>% 
           mutate(df1 = ifelse(df1=="-", "", df1)) %>% 
           mutate(df2 = ifelse(df2=="-", "", df2)) %>% 
           select(Statistic, df1, df2, Value, Reported_P, Computed_P, Correct)
