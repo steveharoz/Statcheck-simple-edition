@@ -47,7 +47,7 @@ ui <- fixedPage(
         column(width = 6, div(
             
             # the input
-            textAreaInput("statcheckInput", "Enter text that reports statistical tests:", "Here is some text with statistical tests F(12,34)=0.56, p=0.048. Blah blah t(123)=.45, p=0.65. Blah blah T(100)=1.9, P=0.03 and also X2(1, N=56) = 7.8, p < .01. \n\nSome non-standard reporting F2,20=2; p = 0.16 and some abnormal spaces F(2,20)\u202F=\u202F2; p\u00A0=\u00A00.26 and T[25] = 1.8;p=0.08 and T25 = 35;p=0 and X\u00B2(1, N=56) = 7.8, p=0.005", width = "100%", row = "10"),
+            textAreaInput("statcheckInput", "Enter text that reports statistical tests:", "Here is some text with statistical tests t(123)=.45, p=0.65. Sometimes, the reported statistics are so internally inconsistent, that they can lead to a decision error F(12,34)=0.56, p=0.048. Sometimes, we can speculate what's off about them T(100)=1.9, P=0.03. Hopefully, everything is correct X2(1, N=56) = 7.8, p < .01. Here's a correlation r(20) = 0.50, p=0.017. \n\nSome non-standard reporting F2,20=2; p = 0.16 and some abnormal spaces F(2,20)\u202F=\u202F2; p\u00A0=\u00A00.26 and T[25] = 1.8;p=0.08 and T25 = 35;p=0 and X\u00B2(1, N=56) = 7.8, p=0.005", width = "100%", row = "10"),
             
             # URL input
             # textInput("URL_input", "Or enter the URL of an article:", ""),
