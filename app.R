@@ -12,7 +12,7 @@ library(stringr)
 library(metathis)
 library(statcheck)
 
-CLOSE_RANGE = 0.05 # percent proximity of computed vs reported p-values to still be considered "close"
+CLOSE_RANGE = 0.01 # proportion proximity of computed vs reported p-values to still be considered "close"
 
 # Define UI for application that draws a histogram
 ui <- fixedPage(
@@ -98,7 +98,11 @@ ui <- fixedPage(
                 a(icon("github"), span("Github"), href="https://github.com/steveharoz/statcheck-simple-edition")
               ),
               br(), 
-              p("To cite this page: ", br(), span("Haroz, S., Nuijten, M. B., Epskamp, S. (2021). StatCheck simple edition [web application]. Retrieved from http://statcheck.steveharoz.com", id="citation"))
+              p(
+                "To cite this page: ", br(), 
+                span("1. Haroz, Steve. (2021). StatCheck simple edition [web application]. Retrieved from http://statcheck.steveharoz.com", class="citation"), br(),
+                span("2. Epskamp, S., & Nuijten, M. B. (2018). statcheck: Extract statistics from articles and recompute p-values (1.3.0) [R package].", class="citation"), br()
+              )
     )))
     
     

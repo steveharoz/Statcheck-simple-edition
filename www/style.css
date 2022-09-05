@@ -1,7 +1,12 @@
+/* font */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap');
+
+
+
 /* footer */
 #credit_box {border: 0; margin-top: 2em; margin-bottom: 1em;}
+.citation {font-family: monospace; word-break: break-word;}
 
-#citation {font-family: monospace; word-break: break-word;}
 /* text area */
 textarea { resize: vertical; }
 
@@ -11,8 +16,9 @@ textarea { resize: vertical; }
 .option * {display: inline;}
 
 /* table style */
+table {font-family: 'Open Sans', sans-serif; font-weight: 300;}
 .error, .decision_error {color:red;}
-.decision_error {font-weight:bold;}
+.decision_error {font-weight:600;}
 
 /* for mobile */
 @media (max-width: 575.98px) {
